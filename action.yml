@@ -1,25 +1,35 @@
 # action.yml
 apiVersion: automation.cloudbees.io/v1alpha1
 kind: action
-name: 'platform-action-hello'
-description: 'Greet someone and record the time'
+name: 'platform-action-maven'
+description: 'using maven to build Java application'
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
+  target:  # the target to build
+    description: 'which target to build'
     required: true
-    default: 'World'
+    default: 'install'
+  project-folder:  # the folder of the project
+    description: 'the folder containing the pom.xml file'
+    required: true
+    default: ''
+  #dest-folder:  # the folder of binary files
+  #  description: 'the folder containing the artifacts for deployment'
+  #  required: true
+  #  default: ''
 outputs:
-  time: # id of output
-    description: 'The time we greeted you'
+  dest-folder:  # the folder of artifacts
+    description: 'the folder containing the artifacts for deployment'
 runs:
   using: composite
   steps:
-    - id: execute
-      name: "execute the entry point script"
-      uses: docker://alpine:3.10
+    - id: build
+      name: "build application"
+      uses: docker://maven:latest
       run: |
-        echo "Hello $WHO"
-        printf %s "11:11:11" > $CLOUDBEES_OUTPUTS/time
+        cd $SOURCE_FOLDER
+        mvn build $TARGET
+        printf "$SOURCE_FOLDER/target" > $CLOUDBEES_OUTPUTS/dest-folder
       env:
-        WHO: ${{ inputs.who-to-greet }}
+        TARGET: ${{ inputs.target }}
+        SOURCE_FOLDER: ${{ inputs.project-folder }}
 
