@@ -27,7 +27,7 @@ runs:
       uses: docker://maven:latest
       run: |
         cd $SOURCE_FOLDER
-        mvn build $TARGET
+        mvn $TARGET
         printf "$SOURCE_FOLDER/target" > $CLOUDBEES_OUTPUTS/dest-folder
       env:
         TARGET: ${{ inputs.target }}
