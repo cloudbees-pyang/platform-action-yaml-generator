@@ -1,1 +1,1 @@
-# platform-action-hello
+# platform-action-maven
