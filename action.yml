@@ -1,36 +1,46 @@
 # action.yml
 apiVersion: automation.cloudbees.io/v1alpha1
 kind: action
-name: 'platform-action-maven'
-description: 'using maven to build Java application'
+name: 'platform-action-yaml-generator'
+description: 'using kubectl to create basic yaml files for pods or deployments'
 inputs:
-  target:  # the target to build
-    description: 'which target to build'
+  object:  # the target to build
+    description: 'which object to create? Currently only support pod or deployment'
     required: true
-    default: 'install'
-  project-folder:  # the folder of the project
-    description: 'the folder containing the pom.xml file'
+    default: 'deployment'
+  folder:  # the folder of the project
+    description: 'the folder to put the generated yaml file'
     required: true
-    default: ''
-  #dest-folder:  # the folder of binary files
-  #  description: 'the folder containing the artifacts for deployment'
-  #  required: true
-  #  default: ''
-outputs:
-  dest-folder:  # the folder of artifacts
-    description: 'the folder containing the artifacts for deployment'
+    default: './yaml'
+  name:  # the name of the object
+    description: 'the name of the object to be created'
+    required: true
+    default: '' 
+  image:  # the container image to be used
+    description: 'the container image to be included in the object'
+    required: true
+    default: '' 
+#outputs:
+#  dest-folder:  # the folder of artifacts
+#    description: 'the folder containing the artifacts for deployment'
 runs:
   using: composite
   steps:
-    - id: build
-      name: "build application"
-      uses: docker://maven:latest
+    - id: generate
+      name: "generate yaml file using kubectl"
+      uses: docker://bitnami/kubectl:latest
       run: |
-        cd $SOURCE_FOLDER
-        chmod a+x ./mvnw
-        ./mvnw $TARGET
-        printf "$SOURCE_FOLDER/target" > $CLOUDBEES_OUTPUTS/dest-folder
+        cd $FOLDER
+        if [ $OBJECT -eq 'deployment']
+        then 
+           kubectl create deployment --image=$IMAGE $NAME --dry-run=client -o yaml > $NAME.yaml
+        else
+           kubectl run $NAME --image=$IMAGE --dry-run=client -o yaml > $NAME.yaml
+        fi
+        
       env:
-        TARGET: ${{ inputs.target }}
-        SOURCE_FOLDER: ${{ inputs.project-folder }}
+        OBJECT: ${{ inputs.object }}
+        NAME: ${{ inputs.name }}
+        FOLDER: ${{ inputs.folder }}
+        IMAGE: ${{ inputs.image }}
 
