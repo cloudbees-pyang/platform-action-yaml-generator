@@ -31,7 +31,7 @@ runs:
       uses: docker://bitnami/kubectl:latest
       run: |
         cd $FOLDER
-        if [ $OBJECT -eq 'deployment' ]
+        if [ $OBJECT = 'deployment' ]
         then 
            kubectl create deployment --image=$IMAGE $NAME --dry-run=client -o yaml > ./$NAME.yaml
         else
