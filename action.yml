@@ -20,9 +20,9 @@ inputs:
     description: 'the container image to be included in the object'
     required: true
     default: '' 
-#outputs:
-#  dest-folder:  # the folder of artifacts
-#    description: 'the folder containing the artifacts for deployment'
+outputs:
+  yaml-file:  # the folder of artifacts
+    description: 'the folder containing the artifacts for deployment'
 runs:
   using: composite
   steps:
@@ -31,13 +31,14 @@ runs:
       uses: docker://poseidon1979/gcloud-kubectl-image:latest
       run: |
         cd $FOLDER
-        touch ./$NAME.yaml
         if [ $OBJECT = 'deployment' ]
         then 
-           kubectl create deployment --image=$IMAGE $NAME --dry-run=client -o yaml >> ./$NAME.yaml
+           kubectl create deployment --image=$IMAGE $NAME --dry-run=client -o yaml > ./$NAME.yaml
         else
-           kubectl run $NAME --image=$IMAGE --dry-run=client -o yaml >> ./$NAME.yaml
+           kubectl run $NAME --image=$IMAGE --dry-run=client -o yaml > ./$NAME.yaml
         fi
+
+        printf "$FOLDER/$NAME.yaml" > $CLOUDBEES_OUTPUTS/yaml-file
         
       env:
         OBJECT: ${{ inputs.object }}
