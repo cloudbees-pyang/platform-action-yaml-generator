@@ -1,1 +1,1 @@
-# platform-action-maven
+# platform-action-yaml-generator
