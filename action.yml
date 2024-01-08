@@ -28,7 +28,7 @@ runs:
   steps:
     - id: generate
       name: "generate yaml file using kubectl"
-      uses: docker://bitnami/kubectl:latest
+      uses: docker://poseidon1979/gcloud-kubectl-image:latest
       run: |
         cd $FOLDER
         touch ./$NAME.yaml
