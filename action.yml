@@ -30,6 +30,7 @@ runs:
       name: "generate yaml file using kubectl"
       uses: docker://poseidon1979/gcloud-kubectl-image:latest
       run: |
+        set -x
         cd $FOLDER
         if [ $OBJECT = 'deployment' ]
         then 
